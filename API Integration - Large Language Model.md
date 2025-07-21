@@ -1,53 +1,4 @@
 > API Reference for Large Language Model (LLM)
-# Using LiteLLM
-
-## Installation
-```bash
-pip install litellm
-```
-## Basic Usage with Streaming
-### Async Streaming Completion
-The AI Marketplace API uses API keys for authentication. Please contact our team to acquire your API Key. 
-
-```python
-from litellm import acompletion
-import json
-import asyncio
-
-async def stream_response():
-    try:
-        # Initialize the completion request
-        response = await acompletion(
-            model="{model-name}", 
-            api_base="https://mkp-api.fptcloud.com",    # Base URL for API
-            api_key="{api-key}",          # Your API key
-            messages=[                    # List of message objects. Please update the System prompt to have the model respond appropriately
-                {
-                    "role": "system",
-                    "content": "You are a helpful assistant capable of understanding a user's needs through conversation to recommend suitable services. Based on the conversation history and the user's last message, list services that can address the user's needs. Respond only in Vietnamese or English, matching the language of the user's input."
-                },
-                {
-                    "role": "user",
-                    "content": "{your-input-text}"
-                }
-            ],
-            stream=True  # Enable streaming
-        )
-        # Process streaming response
-        async for chunk in response:
-            if chunk.choices[0].delta.content:
-                yield f"data: {json.dumps({'content': chunk.choices[0].delta.content})}\n\n"
-    except Exception as e:
-        yield f"data: {json.dumps({'error': str(e)})}\n\n"
-    yield "data: [DONE]\n\n"
-
-async def main():
-    async for data in stream_response():
-        print(data)
-
-if __name__ == '__main__':
-    asyncio.run(main())
-```
 # Python
 ```python
 import requests
@@ -211,6 +162,47 @@ vietnamese_prompt = "Bạn có thể giúp tôi mô tả về hệ mặt trời 
 print("\nTesting Streaming Function:")
 chat_stream_langchain(vietnamese_prompt)
 ```
+# Nodejs
+const OpenAI = require('openai');
+
+const API_KEY = "";
+const BASE_URL = "https://mkp-api.fptcloud.com";
+const MODEL = "SaoLa-Llama3.1-planner"; 
+const USER_PROMPT = "Xin chào" 
+
+const openai = new OpenAI({ apiKey: API_KEY, baseURL: BASE_URL});
+
+async function getLLMResponseWithOpenAI(prompt, model) {
+    try {
+        const response = await openai.chat.completions.create({
+            model: model,
+            messages: [{ role: "user", content: prompt }],
+        });
+
+        if (response.choices && response.choices.length > 0 && response.choices[0].message && response.choices[0].message.content) {
+            return response.choices[0].message.content;
+        } else {
+            console.error("Failed to retrieve response from OpenAI.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error retrieving response from OpenAI:", error);
+        return null;
+    }
+}
+
+async function main() {
+    const llmResponse = await getLLMResponseWithOpenAI(USER_PROMPT, MODEL);
+
+    if (llmResponse) {
+        console.log("\nLLM Response received:");
+        console.log(llmResponse);
+    } else {
+        console.log("\nFailed to retrieve a response from the LLM using the OpenAI library.");
+    }
+}
+
+main();
 # OpenAI
 ```python
 #!/usr/bin/env python3
