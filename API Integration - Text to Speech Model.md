@@ -1,4 +1,5 @@
 # cURL 
+```
 curl --request POST \
   --url https://mkp-api.fptcloud.com/v1/audio/speech \
   --header "Authorization: Bearer your-api-key" \
@@ -9,7 +10,9 @@ curl --request POST \
     "voice": "std_kimngan"
   }' \
   --output speech.wav
+```
 # Python
+```
 from openai import OpenAI
 
 BASE_URL = "https://mkp-api.fptcloud.com"
@@ -25,5 +28,5 @@ response = client.audio.speech.create(
     model=MODEL_NAME,
     voice=VOICE,
 )
-
 response.write_to_file("speech.wav")
+```
